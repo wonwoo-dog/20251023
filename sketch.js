@@ -31,7 +31,7 @@ window.addEventListener('message', function (event) {
         // 判斷是否進入煙火模式 (90% 以上)
         if (percentage >= 90) {
             if (!isPlayingFireworks) {
-                loop(); // 開始持續呼叫 draw()
+                loop(); // 開始持續呼叫 draw()，啟動動畫
                 isPlayingFireworks = true;
                 // 為了讓特效更明顯，可以在剛達到高分時立即發射一顆煙火
                 fireworks.push(new Firework()); 
@@ -43,12 +43,8 @@ window.addEventListener('message', function (event) {
                 isPlayingFireworks = false; 
                 fireworks = []; 
             }
-            // 如果 draw() 正在執行，它會在下一幀反映分數變化。
-            if (isLooping()) {
-                // 如果希望低分時停止動畫以節省資源，可以呼叫 noLoop()，
-                // 但為了確保分數文字能即時更新，可以保留 loop()。
-            } else {
-                // 如果目前是 noLoop() 狀態，必須呼叫 redraw() 來更新分數文字
+            // 確保非動畫狀態下，分數更新時能重繪畫面
+            if (!isLooping()) {
                 redraw();
             }
         }
@@ -72,7 +68,7 @@ function setup() {
 } 
 
 function draw() { 
-    // 使用帶有透明度的黑色背景，創造粒子拖影效果 (50 是透明度)
+    // ！！！關鍵：使用帶有透明度的黑色背景，創造粒子拖影效果 (50 是透明度)
     background(0, 0, 0, 50); 
     
     // 計算百分比
@@ -122,7 +118,8 @@ function draw() {
         
     } else {
         // 尚未收到分數
-        background(255); // 尚未收到分數時，背景為白色
+        // ！！！非高分模式下，背景仍需設為白色以保持清晰度
+        background(255); 
         fill(150);
         text("等待 H5P 成績中...", width / 2, height / 2);
     }
